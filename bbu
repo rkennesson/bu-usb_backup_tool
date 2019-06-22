@@ -57,15 +57,11 @@ fi
 add_exclude() {
     if [ -f /bu.exclude ]; then
         exit RSYNC_CMD += "--exclude-from=bu.exclude"
-    else
-        exit RSYNC_CMD += ""
 }
 
 add_include(){
     if [ -f /bu.include ]; then
         exit RSYNC_CMD += "--files-from=bu.include"
-    else
-        exit RSYNC_CMD += ""
 }
 
 apt_backup(){
@@ -134,4 +130,7 @@ backup() {
 drive_test
 add_include
 add_exclude
-backup
+default_backup
+apt_backup
+iptables_backup
+cron_backup
