@@ -1,55 +1,35 @@
 #!/bin/env bash
 
-# BU - USB Backup Tool (Version 1.0) -- by Joe Collins. (www.ezeelinux.com)
-# A simple tool to create reliable backups of /etc/ and /home from multiple
-# Debian/Ubuntu Linux systems. (May 10, 2019)
-# (GNU/General Public License version 2.0)
-#
-# For Debian 9 and up, Ubuntu 16.04 and up and Linux Mint 18.x and up.
-#
-# ...And away we go!
-
 # Declare static variables:
-
 user=$USER
 host=$HOSTNAME
-backupdirectory=/media/"$user"/BU_Drive/BU_Backups/"$host"
-backupdrive=/media/"$user"/BU_Drive/
+backupdrive=/media/"$user"/BU_Drive
+backupdirectory="$backupdrive"/BU_Backups/"$host"
 RSYNC_CMD='sudo rsync -aH --delete --info=progress2'
 DEFAULT_BACKUP_DIRS='/etc /home'
 
 # Check for less and rsync, install if needed:
-
 dpkg -l | grep -qw rsync || sudo apt install rsync -yyq
 dpkg -l | grep -qw less || sudo apt install less -yyq
 
-# Set functions:
-
+# functions
 drive_test() {
 
-# This function checks for a usable USB drive.
-
 # Checking for any USB drive:
-
 if [[ ! $(lsblk -S -o  TRAN | grep 'usb') = *usb* ]]; then
-
     echo $'\n'$"BU Error: No USB drive connected!" >&2
     echo "- Check to see that BU_Drive is plugged in." >&2
     echo "- Pleese run 'bu --help' to learn about drive setup. :)" >&2
     exit 1
-
 fi
 
 # Checking for a USB drive that is setup for BU:
-
 if [ ! -d /media/"$user"/BU_Drive ]; then
-
     echo $'\n'$"BU Error: No USB drive with a partition labeled "BU_Drive!"" >&2
     echo "- The drive(s) you have plugged in are not ready for use with BU." >&2
     echo "- Don't launch BU as root or with 'sudo bu.'" >&2
     echo "- Please run 'bu --help' to learn about drive setup. :)" >&2
     exit 1
-
 fi
 
 }
@@ -79,12 +59,10 @@ cron_backup(){
 backup() {
 
 	# Check for sudo privilages:
-
 	echo "Checking for sudo privileges..."
 	sudo ls >/dev/null
 
 	# Making sure user has ownership of the BU_Drive:
-
 	echo "Changing ownership of BU_Drive to $user..."
 	sudo chown "$user" /media/"$user"/BU_Drive/
 
@@ -95,23 +73,17 @@ backup() {
 	# Check if directory for host machine was successfully created:
 
 	if mkdir -p /media/"$user"/BU_Drive/BU_Backups/"$host"; then
-
 		echo "...Done. BU_Drive is ready."
-
 	else
-
 		echo $'\n'$"BU Error: Could not create directroy for $host!" >&2
 		echo "- Backup aborted. Check the status of the BU_Drive." >&2
 		exit 1
 	fi
 
-	# Run rsync command:
-
-		echo "Backing up /etc and /home to BU_Drive/BU_Backups/$host/..."
+	echo "Backing up /etc and /home to BU_Drive/BU_Backups/$host/..."
 
 	# Check for status of backup and exit:
 	if sudo rsync -aH --delete --info=progress2 --exclude-from=bu.exclude /etc /home /media/"$user"/BU_Drive/BU_Backups/"$host"/; then
-
 		# Clear any accidental input during backup:
 		read -r -t 1 -n 10000
 		echo "Wait! Syncing Drives..."
