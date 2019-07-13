@@ -1,6 +1,7 @@
 # bu-usb_backup_tool
 
-    `tune2fs -m 0`
+    tune2fs -m 0
+
 1. Description:
 
  BU is a program that makes keeping all of your user data safely backed up on
