@@ -1,6 +1,6 @@
 # bu-usb_backup_tool
 
-    tune2fs -m 0
+    sudo tune2fs -m 0 /dev/sdc1
 
 1. Description:
 
